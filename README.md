@@ -11,6 +11,8 @@ RichText Control for JavaFX
 public RichText RichTextControl = new RichText();
 
 // ...
+this.RichTextControl.SetSpellCheckingSupport(true);
+
 this.RichTextControl.AddText("Hello World ", 12);
 this.RichTextControl.AddLine();
 this.RichTextControl.AddText("Rich Text Test", 28);
