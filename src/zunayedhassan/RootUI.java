@@ -44,12 +44,13 @@ public class RootUI extends BaseUI {
     protected Button centerJustfyToggleButton = this._getIconButton("SimpleRichTextFX/icons/format-justify-center.png");
     protected Button rightJustfyToggleButton = this._getIconButton("SimpleRichTextFX/icons/format-justify-right.png");
     protected ColorPicker fontColorPicker = new ColorPicker(Color.BLACK);
+    protected ToggleButton spellCheckToggleButton = this._getIconToggleButton("SimpleRichTextFX/icons/tools-check-spelling.png");
     
     public RootUI() {    
         this._initializeLayout();
         this._initializeEvents();
         
-        // Example
+        // Example        
         this.RichTextControl.AddText("Hello World ", 12);
         this.RichTextControl.AddLine();
         this.RichTextControl.AddText("Rich Text Test", 28);
@@ -65,6 +66,13 @@ public class RootUI extends BaseUI {
         this.RichTextControl.SetCenterJustifyInLine(2);
         this.RichTextControl.SetRightJustifyInLine(3);
         this.RichTextControl.SetColorInLine(2, 1, 5, Color.web("#51dacd"));
+        this.RichTextControl.AddLine();
+        this.RichTextControl.AddText("Spellcheck is also available now!!!", 28);
+        this.RichTextControl.SetFontSizeInLine(1, 1, 5, 36);
+        this.RichTextControl.SetBoldInLine(3, 1, 5, false);
+        this.RichTextControl.SetItalicInLine(3, 1, 5, false);
+        this.RichTextControl.SetUndelineInLine(3, 1, 5, false);
+        this.RichTextControl.SetStrikethroughInLine(3, 1, 5, false);
     }
     
     private ComboBox<String> _getFontsCombobox() {
@@ -82,7 +90,7 @@ public class RootUI extends BaseUI {
         ComboBox<String> fontSize = new ComboBox<>();
         
         fontSize.getItems().addAll(
-                "8", "10", "12", "14", "16", "18", "20", "22", "24", "36", "48"
+                "8", "10", "12", "14", "16", "18", "20", "22", "24", "36", "48", "72"
         );
         
         fontSize.getSelectionModel().select(2);
@@ -118,7 +126,8 @@ public class RootUI extends BaseUI {
                 this.centerJustfyToggleButton,
                 this.rightJustfyToggleButton,
                 new Separator(),
-                this.fontColorPicker
+                this.fontColorPicker,
+                this.spellCheckToggleButton
         );
         
         this.setTop(this.RichTextToolBar);
@@ -205,6 +214,13 @@ public class RootUI extends BaseUI {
             @Override
             public void changed(ObservableValue<? extends Color> observable, Color oldValue, Color choosenColor) {
                 RichTextControl.SetColor(choosenColor);
+            }
+        });
+        
+        this.spellCheckToggleButton.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean isSelected) {
+                RichTextControl.SetSpellCheckingSupport(isSelected);
             }
         });
     }

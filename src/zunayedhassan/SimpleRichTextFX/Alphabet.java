@@ -14,6 +14,10 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -50,6 +54,8 @@ public class Alphabet extends HBox {
                 this._characterRoom,
                 this._caretRoom
         );
+        
+        this.setPadding(new Insets(0, 0, 2, 0));
         
         // Event
         this.SelectProperty.addListener(new ChangeListener<Boolean>() {
@@ -173,6 +179,27 @@ public class Alphabet extends HBox {
         this._character.setFill(color);
     }
     
+    public void SetSpellCheckingOn(boolean isEnabled) {
+        if (isEnabled) {
+            this.setBorder(
+                new Border(
+                        new BorderStroke(
+                                Color.RED,
+                                BorderStrokeStyle.DASHED,
+                                CornerRadii.EMPTY,
+                                new BorderWidths(0, 0, 1, 0))));
+        }
+        else {
+            this.setBorder(
+                new Border(
+                        new BorderStroke(
+                                Color.RED,
+                                BorderStrokeStyle.NONE,
+                                CornerRadii.EMPTY,
+                                new BorderWidths(0, 0, 0, 0))));
+        }
+    }
+    
     private void _updateSize(String newValue) {
         if (newValue.equals("")) {
             _characterRoom.setMinWidth(5);
@@ -180,5 +207,10 @@ public class Alphabet extends HBox {
         else {
             _characterRoom.setMinWidth(0);
         }
+    }
+    
+    @Override
+    public String toString() {
+        return this._character.getText();
     }
 }

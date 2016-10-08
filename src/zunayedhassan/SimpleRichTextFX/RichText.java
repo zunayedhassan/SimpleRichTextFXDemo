@@ -5,6 +5,10 @@
  */
 package zunayedhassan.SimpleRichTextFX;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -24,6 +28,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javax.imageio.stream.FileImageInputStream;
 
 /**
  *
@@ -34,6 +39,8 @@ public class RichText extends VBox {
     private boolean _isCtrlKeyPressed = false;
     private boolean _isShiftKeyPressed = false;
     private Clipboard _clipboard = Clipboard.getSystemClipboard();
+    private boolean _isSpellCheckOn = false;
+    private ArrayList<String> _dictionary = new ArrayList<>();
     
     protected int currentSelectedLine = -1;
     
@@ -218,6 +225,8 @@ public class RichText extends VBox {
                             }
                         }
                     }
+                    
+                    CheckForSpellingMistake();
                 }
                 // [BACKSPACE]
                 else if (event.getCode() == KeyCode.BACK_SPACE) {                    
@@ -272,6 +281,8 @@ public class RichText extends VBox {
                                     break;
                                 }
                             }
+                            
+                            CheckForSpellingMistake(i);
 
                             if (isCaretFound) {
                                 break;
@@ -974,6 +985,8 @@ public class RichText extends VBox {
                         for (Alphabet onwardCharacter : tempText) {
                             line.getChildren().add(onwardCharacter);
                         }
+                        
+                        this.CheckForSpellingMistake(i);
 
                         break;
                     }
@@ -990,6 +1003,8 @@ public class RichText extends VBox {
             if (lastLine != null) {
                 lastLine.getChildren().add(new Alphabet(this, text));
             }
+            
+            this.CheckForSpellingMistake(this.getChildren().size() - 1);
         }
     }
     
@@ -1658,5 +1673,134 @@ public class RichText extends VBox {
     
     private ImageView _getIcon(String image) {
         return new ImageView(new Image(this.getClass().getResourceAsStream(image)));
+    }
+    
+    public void SetSpellCheckingSupport(boolean isSpellCheck) {
+        this._isSpellCheckOn = isSpellCheck;
+        
+        if (this._isSpellCheckOn) {
+            this._dictionary.clear();
+            
+            try {
+                BufferedReader bufferedReader = new BufferedReader(new FileReader("Resources/words3.txt"));
+
+                String line = null;
+
+                while ((line = bufferedReader.readLine()) != null) {
+                    this._dictionary.add(line);
+                }
+            }
+            catch (FileNotFoundException exception) {
+                exception.printStackTrace();
+            }
+            catch (IOException exception) {
+                exception.printStackTrace();
+            }
+            
+            this.CheckForSpellingMistake();
+        }
+        else {
+            this._dictionary.clear();
+            
+            for (int i = 0; i < GetTotalLines(); i++) {
+                zunayedhassan.SimpleRichTextFX.Line line = (zunayedhassan.SimpleRichTextFX.Line) getChildren().get(i);
+
+                for (int j = 0; j < line.getChildren().size(); j++) {
+                    Alphabet character = (Alphabet) line.getChildren().get(j);
+                    
+                    character.SetSpellCheckingOn(false);
+                }
+            }
+        }
+    }
+    
+    public boolean IsSpellCheckingSupport() {
+        return this._isSpellCheckOn;
+    }
+    
+    public void CheckForSpellingMistake(int lineIndex) {
+        if (this.IsSpellCheckingSupport()) {
+            zunayedhassan.SimpleRichTextFX.Line line = (zunayedhassan.SimpleRichTextFX.Line) getChildren().get(lineIndex);
+            
+            ArrayList<Alphabet> wordsInLine = new ArrayList<>();
+
+            for (int i = 0; i <= line.GetTotalCharacters(); i++) {
+                Alphabet character = (Alphabet) line.getChildren().get(i);
+
+                if (!character.GetText().equals("~") &&
+                    !character.GetText().equals("!") &&
+                    !character.GetText().equals("@") &&
+                    !character.GetText().equals("#") &&
+                    !character.GetText().equals("$") &&
+                    !character.GetText().equals("%") &&
+                    !character.GetText().equals("^") &&
+                    !character.GetText().equals("&") &&
+                    !character.GetText().equals("*") &&
+                    !character.GetText().equals("(") &&
+                    !character.GetText().equals(")") &&
+                    !character.GetText().equals("-") &&
+                    !character.GetText().equals("+") &&
+                    !character.GetText().equals("_") &&
+                    !character.GetText().equals("=") &&
+                    !character.GetText().equals("[") &&
+                    !character.GetText().equals("]") &&
+                    !character.GetText().equals("{") &&
+                    !character.GetText().equals("}") &&
+                    !character.GetText().equals(";") &&
+                    !character.GetText().equals("'") &&
+                    !character.GetText().equals(":") &&
+                    !character.GetText().equals("\"") &&
+                    !character.GetText().equals("\\") &&
+                    !character.GetText().equals("|") &&
+                    !character.GetText().equals(",") &&
+                    !character.GetText().equals(".") &&
+                    !character.GetText().equals("<") &&
+                    !character.GetText().equals(">") &&
+                    !character.GetText().equals("/") &&
+                    !character.GetText().equals("?")) {
+                    
+                    wordsInLine.add(character);
+
+                    if (character.GetText().equals(" ") ||
+                       (i == line.GetTotalCharacters())) {
+
+                        String word = "";
+
+                        for (Alphabet currentCharacter : wordsInLine) {
+                            word += currentCharacter.GetText();
+                        }
+
+                        word = word.trim().toLowerCase();
+                        boolean isFound = false;
+
+                        for (String currentWord : this._dictionary) {
+                            if (currentWord.toLowerCase().trim().equals(word)) {
+                                isFound = true;
+                                break;
+                            }
+                        }
+
+                        if (!isFound) {
+                            for (Alphabet currentCharacter : wordsInLine) {
+                                currentCharacter.SetSpellCheckingOn(true);
+                            }
+                        }
+                        else {
+                            for (Alphabet currentCharacter : wordsInLine) {
+                                currentCharacter.SetSpellCheckingOn(false);
+                            }
+                        }
+
+                        wordsInLine.clear();
+                    }
+                }
+            }
+        }
+    }
+    
+    public void CheckForSpellingMistake() {
+        for (int i = 0; i < this.GetTotalLines(); i++) {
+            this.CheckForSpellingMistake(i);
+        }
     }
 }
