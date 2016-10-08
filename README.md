@@ -1,6 +1,8 @@
 # SimpleRichTextFX Demo
 RichText Control for JavaFX
 
+## Download (Demo): https://github.com/zunayedhassan/SimpleRichTextFXDemo/blob/master/Download/SimpleRichTextFXDemo.zip
+
 ![ScreenShot](https://github.com/zunayedhassan/SimpleRichTextFXDemo/blob/master/preview.png?raw=true)
 
 ## Useage
